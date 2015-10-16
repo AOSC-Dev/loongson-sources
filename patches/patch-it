@@ -1,11 +1,9 @@
 #!/bin/bash
+die(){ echo "$1">&2; exit "${2-1}"; }
+shopt -s globstar extglob || die "globstar/extglob option not supported by your bash." 2
 
-for file in `tree -if --noreport | egrep "\.(patch|patch1|diff)$"`; do
-    echo Apply $file
-    patch -p1 < $file
-    if [ $? != 0 ]; then
-        echo "Failed to patch $file"
-        exit 1
-    fi
+for file in ./**/*.@(patch|patch1|diff); do
+    echo Apply "$file"
+    patch -Np1 -i "$file" || die "Failed to patch $file"
 done
 echo "Done"
