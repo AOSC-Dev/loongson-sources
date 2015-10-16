@@ -1,9 +1,12 @@
 #!/bin/bash
-die(){ echo "$1">&2; exit "${2-1}"; }
-shopt -s globstar extglob || die "globstar/extglob option not supported by your bash." 2
+boom(){ printf 'fatal:\t%b' "$1">&2; exit "${2-1}"; }
+shopt -s globstar extglob ||
+    boom "globstar/extglob option not supported by your bash ($BASH_VERSION).
+\\tTry using bash 4.x." 2
 
 for file in ./**/*.@(patch|patch1|diff); do
-    echo Apply "$file"
-    patch -Np1 -i "$file" || die "Failed to patch $file"
+    printf "info:\\tApply $file"
+    patch -Np1 -i "$file" ||
+        boom "Failed to patch $file."
 done
 echo "Done"
